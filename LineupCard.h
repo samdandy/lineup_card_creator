@@ -15,6 +15,35 @@ struct lineup_card_headers {
     string venue;
 };
 
+
+bool check_if_position_taken(const vector<shared_ptr<Player>>& players, const int& position) {
+    for (const auto &player : players) {
+        if (player->position == position){
+            return true;
+        }
+    }
+    return false;
+}
+
+bool check_if_number_taken(const vector<shared_ptr<Player>>& players, const int& number) {
+    for (const auto &player : players) {
+        if (player->number == number){
+            return true;
+        }
+    }
+    return false;
+}
+
+bool check_if_batting_order_position_taken(const vector<shared_ptr<Player>>& players, const int& batting_order_position) {
+    for (const auto &player : players) {
+        if (player->batting_order_position == batting_order_position){
+            return true;
+        }
+    }
+    return false;
+}
+
+
 class LineupCard {
 public:
     lineup_card_headers header;
@@ -88,10 +117,10 @@ public:
             getline(cin, input);
             try {
                 number = string_to_int(input);
-                if (number >= 0) {
+                if (number >= 0 && !check_if_number_taken(players, number)) {
                     break;
                 }
-                cout << "Invalid number. Please enter a positive integer.\n";
+                cout << "Invalid number. Please enter a positive integer and ensure it is not already taken.\n";
             } catch (const invalid_argument& e) {
                 cout << "Invalid input. Please enter a positive integer.\n";
             }
@@ -106,10 +135,10 @@ public:
             }
             try {
                 fielding_pos = string_to_int(input);
-                if (fielding_pos >= 1 && fielding_pos <= 10) {
+                if ((fielding_pos >= 1 && fielding_pos <= 10) && !check_if_position_taken(players, fielding_pos)) {
                     break;
                 }
-                cout << "Invalid position. Must be between 1 and 10 (DH).\n";
+                cout << "Invalid position. Must be between 1 and 10 (DH) and not already taken.\n";
             } catch (const invalid_argument& e) {
                 cout << "Invalid input. Please enter a number between 1 and 10 (DH).\n";
             }
@@ -125,10 +154,10 @@ public:
                 }
                 try {
                     batting_order_pos = string_to_int(input);
-                    if (batting_order_pos >= 1 && batting_order_pos <= 9) {
+                    if ((batting_order_pos >= 1 && batting_order_pos <= 9) && !check_if_batting_order_position_taken(players, batting_order_pos)) {
                         break;
                     }
-                    cout << "Invalid batting order. Must be between 1 and 9.\n";
+                    cout << "Invalid batting order. Must be between 1 and 9 and not already taken.\n";
                 } catch (const invalid_argument& e) {
                     cout << "Invalid input. Please enter a number between 1 and 9.\n";
                 }
