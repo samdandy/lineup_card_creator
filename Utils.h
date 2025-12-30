@@ -48,4 +48,17 @@ bool check_if_batting_order_position_taken(const vector<shared_ptr<Player>>& pla
     }
     return false;
 }
+
+vector<shared_ptr<Player>> sort_batting_order(const vector<shared_ptr<Player>>& players) {
+    vector<shared_ptr<Player>> sorted_players = players;
+    for (const auto &player: players) {
+        for (size_t i = 0; i < sorted_players.size() - 1; ++i) {
+            if (sorted_players[i]->batting_order_position > sorted_players[i + 1]->batting_order_position) {
+                swap(sorted_players[i], sorted_players[i + 1]);
+            }
+        }
+    }
+    return sorted_players;
+}
+
 #endif 

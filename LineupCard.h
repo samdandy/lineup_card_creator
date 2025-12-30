@@ -35,15 +35,15 @@ public:
         header = lc.header;
         players = lc.players;
     }
-    vector<shared_ptr<Player>> get_starters() const {
+    vector<shared_ptr<Player>> get_starters(const bool& sort=false) const {
         vector<shared_ptr<Player>> starters;
         for (const auto &player : players) {
             if (player->position != 0) {
-                if(player->batting_order_position==0){
-                    player->batting_order_position==-1;
-                }
                 starters.push_back(player);
             }
+        }
+        if (sort) {
+            starters = sort_batting_order(starters);
         }
         return starters;
     }
@@ -190,7 +190,7 @@ vector<shared_ptr<Player>> prompt_for_players() {
         file << "-------------------------------------------------------------------------------------------" << endl;
         file << "Batting Order| Player Name           | Number | Position" << endl;
         file << "-------------------------------------------------------------------------------------------" << endl;
-        auto starters = get_starters();
+        auto starters = get_starters(true);
         for (const auto &player : starters) {
             file << "      " << player->batting_order_position << "      | " 
                  << player->get_full_name() << string(22 - player->get_full_name().length(), ' ') << "| "
@@ -219,7 +219,13 @@ vector<shared_ptr<Player>> prompt_for_players() {
         for (const auto &player : players) {
             cout << "Added player: " << player->get_player_info() << endl;
         }
-        write_lineup_card_to_file("lineup_card.txt");
+        string file_name;
+        cout << "Enter filename to save lineup card (default 'lineup_card.txt'): ";
+        getline(cin, file_name);
+        if (file_name.empty()) {
+            file_name = headers.date + "_" + to_lower(headers.opponent) + "_lineup_card.txt";
+        }
+        write_lineup_card_to_file(file_name);
     
 }
     
