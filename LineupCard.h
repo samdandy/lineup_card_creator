@@ -39,6 +39,9 @@ public:
         vector<shared_ptr<Player>> starters;
         for (const auto &player : players) {
             if (player->position != 0) {
+                if(player->batting_order_position==0){
+                    player->batting_order_position==-1;
+                }
                 starters.push_back(player);
             }
         }
@@ -122,7 +125,7 @@ vector<shared_ptr<Player>> prompt_for_players() {
             getline(cin, input);
             try {
                 number = string_to_int(input);
-                if (number >= 0 && !check_if_number_taken(players, number)) {
+                if ((number >= 0 && number <100) && !check_if_number_taken(players, number)) {
                     break;
                 }
                 cout << "Invalid number. Please enter a positive integer and ensure it is not already taken.\n";
@@ -185,7 +188,7 @@ vector<shared_ptr<Player>> prompt_for_players() {
         file << "Opponent: " << header.opponent << endl;
         file << "Venue: " << header.venue << endl;
         file << "-------------------------------------------------------------------------------------------" << endl;
-        file << "Batting Order| Player Name          | Number | Position" << endl;
+        file << "Batting Order| Player Name           | Number | Position" << endl;
         file << "-------------------------------------------------------------------------------------------" << endl;
         auto starters = get_starters();
         for (const auto &player : starters) {
