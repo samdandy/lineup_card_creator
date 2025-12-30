@@ -6,7 +6,9 @@
 #include <memory>
 #include "Player.h"
 #include "Utils.h"
-
+#include <fstream>
+#include <iostream>
+#include <mutex>
 using namespace std;
 
 struct lineup_card_headers {
@@ -15,34 +17,7 @@ struct lineup_card_headers {
     string venue;
 };
 
-
-bool check_if_position_taken(const vector<shared_ptr<Player>>& players, const int& position) {
-    for (const auto &player : players) {
-        if (player->position == position){
-            return true;
-        }
-    }
-    return false;
-}
-
-bool check_if_number_taken(const vector<shared_ptr<Player>>& players, const int& number) {
-    for (const auto &player : players) {
-        if (player->number == number){
-            return true;
-        }
-    }
-    return false;
-}
-
-bool check_if_batting_order_position_taken(const vector<shared_ptr<Player>>& players, const int& batting_order_position) {
-    for (const auto &player : players) {
-        if (player->batting_order_position == batting_order_position){
-            return true;
-        }
-    }
-    return false;
-}
-
+mutex file_mutex;
 
 class LineupCard {
 public:
@@ -96,14 +71,44 @@ public:
     }
     return false;
 }
-
-    vector<shared_ptr<Player>> prompt_for_players() {
+bool check_starting_lineup_complete(const LineupCard& lineup_card) {
+    auto starters = lineup_card.get_starters();
+    if (starters.size() != 9) {
+        return false;
+    }
+    //check if all positions 1-9 are filled
+    for (int pos = 1; pos <=9; pos++) {
+        if (!check_if_position_taken(starters, pos)) {
+            return false;
+        }
+    }
+    //check if all batting order positions 1-9 are filled
+    for (int bat_pos = 1; bat_pos <=9; bat_pos++) {
+        if (!check_if_batting_order_position_taken(starters, bat_pos)) {
+            return false;
+        }
+    }
+    return true;
+}
+vector<shared_ptr<Player>> prompt_for_players() {
     vector<shared_ptr<Player>> players;
     string input;
     while (true) {
         cout << "Enter player first name (or 'done' to finish): ";
+       
         getline(cin, input);
-        if (input == "done") break;
+        if (input == "done") {
+            bool starters_complete = check_starting_lineup_complete(LineupCard(header, players));
+            if (!starters_complete) {
+                cout << players.size() << " players added so far.\n";
+                cout << "Warning: Starting lineup is not complete. Please ensure 9 unique fielding positions are filled.\n";
+            }
+            else {
+                break;
+            }
+            cout << "Enter player first name (or 'done' to finish): ";
+            getline(cin, input);
+        }
         
         string first_name = input;
         
@@ -166,9 +171,41 @@ public:
         
         players.push_back(make_shared<Player>(first_name, last_name, number, fielding_pos, batting_order_pos));
     }
+   
     return players;
     }
-        
+    
+    void write_lineup_card_to_file(const string& filename) {
+        lock_guard<mutex> lock(file_mutex);
+        ofstream file(filename);
+        if (!file) {
+            throw runtime_error("Unable to open file: " + filename);
+        }
+        file << "Date: " << header.date << endl;
+        file << "Opponent: " << header.opponent << endl;
+        file << "Venue: " << header.venue << endl;
+        file << "-------------------------------------------------------------------------------------------" << endl;
+        file << "Batting Order | Player Name             | Number | Position" << endl;
+        file << "-------------------------------------------------------------------------------------------" << endl;
+        auto starters = get_starters();
+        for (const auto &player : starters) {
+            file << "      " << player->batting_order_position << "      | " 
+                 << player->get_full_name() << string(22 - player->get_full_name().length(), ' ') << "| "
+                 << player->number << string(7 - to_string(player->number).length(), ' ') << "| "
+                 << player->position << endl;
+        }
+        auto subs = get_substitutes();
+        if (!subs.empty()) {
+            file << "-------------------------------------------------------------------------------------------" << endl;
+            file << "Substitutes:" << endl;
+            for (const auto &player : subs) {
+                file << "                | " 
+                     << player->get_full_name() << string(22 - player->get_full_name().length(), ' ') << "| "
+                     << player->number << string(7 - to_string(player->number).length(), ' ') << "| "
+                     << "Substitute" << endl;
+            }
+        }
+    }
 
     void create_new_lineup_card() {
         lineup_card_headers headers = prompt_for_card_headers();
@@ -179,9 +216,13 @@ public:
         for (const auto &player : players) {
             cout << "Added player: " << player->get_player_info() << endl;
         }
+        write_lineup_card_to_file("lineup_card.txt");
+    
 }
     
 };
+
+
 
 
 void lineup_card_app(){
