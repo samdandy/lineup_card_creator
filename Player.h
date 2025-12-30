@@ -31,7 +31,7 @@ class Player {
     }
 
     string get_player_info() {
-        return "Name: " + get_full_name() + ", Number: " + to_string(number) + ", Position: " + to_string(position);
+        return "Name: " + get_full_name() + ", Number: " + to_string(number) + ", Position: " + to_string(position) + ", Batting Order Position: " + to_string(batting_order_position);
     }
 
     void set_position(const int &pos) {

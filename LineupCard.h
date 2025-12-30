@@ -73,18 +73,18 @@ public:
 }
 bool check_starting_lineup_complete(const LineupCard& lineup_card) {
     auto starters = lineup_card.get_starters();
-    if (starters.size() != 9) {
+    if (starters.size() < 9) {
         return false;
     }
-    //check if all positions 1-9 are filled
     for (int pos = 1; pos <=9; pos++) {
         if (!check_if_position_taken(starters, pos)) {
+            cout << "Position " << pos << " is not filled." << endl;
             return false;
         }
     }
-    //check if all batting order positions 1-9 are filled
     for (int bat_pos = 1; bat_pos <=9; bat_pos++) {
         if (!check_if_batting_order_position_taken(starters, bat_pos)) {
+            cout << "Batting order position " << bat_pos << " is not filled." << endl;
             return false;
         }
     }
@@ -185,7 +185,7 @@ vector<shared_ptr<Player>> prompt_for_players() {
         file << "Opponent: " << header.opponent << endl;
         file << "Venue: " << header.venue << endl;
         file << "-------------------------------------------------------------------------------------------" << endl;
-        file << "Batting Order | Player Name             | Number | Position" << endl;
+        file << "Batting Order| Player Name          | Number | Position" << endl;
         file << "-------------------------------------------------------------------------------------------" << endl;
         auto starters = get_starters();
         for (const auto &player : starters) {
