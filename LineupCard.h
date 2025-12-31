@@ -98,7 +98,6 @@ vector<shared_ptr<Player>> prompt_for_players() {
     string input;
     while (true) {
         cout << "Enter player first name (or 'done' to finish): ";
-       
         getline(cin, input);
         if (input == "done") {
             bool starters_complete = check_starting_lineup_complete(LineupCard(header, players));
@@ -169,8 +168,8 @@ vector<shared_ptr<Player>> prompt_for_players() {
         this->header = headers;
         auto players = prompt_for_players();
         this->players = players;
-        for (const auto &player : players) {
-            cout << "Added player: " << player->get_player_info() << endl;
+        if (!check_starting_lineup_complete(*this)) {
+            return;
         }
         string file_name;
         cout << "Enter filename to save lineup card (default 'lineup_card.txt'): ";
@@ -179,48 +178,38 @@ vector<shared_ptr<Player>> prompt_for_players() {
             file_name = headers.date + "_" + to_lower(headers.opponent) + "_lineup_card.txt";
         }
         write_lineup_card_to_file(file_name);
-    
     }
 };
     
-
-    
-    
-
-
 
 void lineup_card_app(){
     string operation;
     string lineup_name;
     string create_operation;
-    cout << "This is a lineup card management system." << endl;
+    startup_art();
     while(true){
-        cout << "Enter 'exit' to quit or press Enter to continue: ";
+        cout << "'exit' to quit, 'create' new lineup card, 'view' display lineup card: ";
         getline(cin, operation);
         operation = to_lower(operation);
         if (operation == "exit") {
             break;
         }
         if (operation == "view") {
-            cout << "Enter lineup card name to view: " << endl;
+            cout << "Enter lineup card name to view: ";
             getline(cin, lineup_name);
             cout << "Viewing lineup card: " << lineup_name << endl;
-         
         }
         if (operation == "create"){
-            cout << "Create a new lineup card from scratch or reuse an old one?";
+            cout << "Create a new lineup card from scratch or reuse an old one? (new/reuse):";
             getline(cin, create_operation);
             if (create_operation == "new"){
                 cout << "Creating a new lineup card from scratch." << endl;
                 LineupCard lineup_card;
-                lineup_card.create_new_lineup_card();
-                
+                lineup_card.create_new_lineup_card();         
             }
         }
     }
 }
-
-
 
 
 #endif

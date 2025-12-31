@@ -132,4 +132,12 @@ int prompt_for_player_batting_order_position(const vector<shared_ptr<Player>>& p
     return batting_order_pos;
 }
 
+
+
+void startup_art(){
+    cout << "======================================" << endl;
+    cout << "     SHUM'S LINEUP CARD APP          " << endl;
+    cout << "======================================" << endl;
+}
+
 #endif 
