@@ -111,74 +111,27 @@ vector<shared_ptr<Player>> prompt_for_players() {
             }
             cout << "Enter player first name (or 'done' to finish): ";
             getline(cin, input);
+            if (input == "done") {
+                break;
         }
+     }
         
         string first_name = input;
-        
-        cout << "Enter player last name: ";
-        getline(cin, input);
-        string last_name = input;
-        
-        int number;
-        while (true) {
-            cout << "Enter player number: ";
-            getline(cin, input);
-            try {
-                number = string_to_int(input);
-                if ((number >= 0 && number <100) && !check_if_number_taken(players, number)) {
-                    break;
-                }
-                cout << "Invalid number. Please enter a positive integer and ensure it is not already taken.\n";
-            } catch (const invalid_argument& e) {
-                cout << "Invalid input. Please enter a positive integer.\n";
-            }
-        }
-      
-        int fielding_pos = 0;
-        while (true) {
-            cout << "Enter player position 1-10 10=DH(or leave blank for substitute): ";
-            getline(cin, input);
-            if (input.empty()) {
-                break;
-            }
-            try {
-                fielding_pos = string_to_int(input);
-                if ((fielding_pos >= 1 && fielding_pos <= 10) && !check_if_position_taken(players, fielding_pos)) {
-                    break;
-                }
-                cout << "Invalid position. Must be between 1 and 10 (DH) and not already taken.\n";
-            } catch (const invalid_argument& e) {
-                cout << "Invalid input. Please enter a number between 1 and 10 (DH).\n";
-            }
-        }
-        
+        string last_name = prompt_for_player_last_name();
+        int number = prompt_for_player_number(players);
+        int fielding_pos = prompt_for_player_fielding_position(players);
         int batting_order_pos = 0;
         if (fielding_pos != 0) {
-            while (true) {
-                cout << "Enter batter order position 1-9: ";
-                getline(cin, input);
-                if (input.empty()) {
-                    break;
-                }
-                try {
-                    batting_order_pos = string_to_int(input);
-                    if ((batting_order_pos >= 1 && batting_order_pos <= 9) && !check_if_batting_order_position_taken(players, batting_order_pos)) {
-                        break;
-                    }
-                    cout << "Invalid batting order. Must be between 1 and 9 and not already taken.\n";
-                } catch (const invalid_argument& e) {
-                    cout << "Invalid input. Please enter a number between 1 and 9.\n";
-                }
-            }
+            batting_order_pos = prompt_for_player_batting_order_position(players);
         }
         
         players.push_back(make_shared<Player>(first_name, last_name, number, fielding_pos, batting_order_pos));
     }
-   
+
     return players;
-    }
-    
-    void write_lineup_card_to_file(const string& filename) {
+   }
+
+   void write_lineup_card_to_file(const string& filename) {
         lock_guard<mutex> lock(file_mutex);
         ofstream file(filename);
         if (!file) {
@@ -227,10 +180,12 @@ vector<shared_ptr<Player>> prompt_for_players() {
         }
         write_lineup_card_to_file(file_name);
     
-}
-    
+    }
 };
+    
 
+    
+    
 
 
 
