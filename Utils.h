@@ -6,6 +6,12 @@
 #include <memory>
 using namespace std;
 
+struct lineup_card_headers {
+    string date;
+    string opponent;
+    string venue;
+};
+
 int string_to_int(const string& input) {
     try {
         int value = stoi(input);
@@ -61,6 +67,16 @@ vector<shared_ptr<Player>> sort_batting_order(const vector<shared_ptr<Player>>& 
     return sorted_players;
 }
 
+lineup_card_headers prompt_for_card_headers() {
+        lineup_card_headers headers;
+        cout << "Enter date (YYYY-MM-DD): ";
+        getline(cin, headers.date);
+        cout << "Enter opponent team name: ";
+        getline(cin, headers.opponent);
+        cout << "Enter venue: ";
+        getline(cin, headers.venue);
+        return headers;
+    }
 
 string prompt_for_player_last_name() {
     cout << "Enter player last name: ";

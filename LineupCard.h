@@ -11,11 +11,6 @@
 #include <mutex>
 using namespace std;
 
-struct lineup_card_headers {
-    string date;
-    string opponent;
-    string venue;
-};
 
 mutex file_mutex;
 
@@ -58,16 +53,7 @@ public:
         return subs;
     }
 
-    lineup_card_headers prompt_for_card_headers() {
-        lineup_card_headers headers;
-        cout << "Enter date (YYYY-MM-DD): ";
-        getline(cin, headers.date);
-        cout << "Enter opponent team name: ";
-        getline(cin, headers.opponent);
-        cout << "Enter venue: ";
-        getline(cin, headers.venue);
-        return headers;
-    }
+    
     bool check_position_input(const string& type, const int& input) {
     if (type == "batting_order_position" || type == "fielding_position") {
         return input >= 1 && input <= 9;
@@ -179,6 +165,24 @@ vector<shared_ptr<Player>> prompt_for_players() {
         }
         write_lineup_card_to_file(file_name);
     }
+
+    static void display_lineup_card(const string& filename){
+        try {
+            lock_guard<mutex> lock(file_mutex);
+            fstream file(filename);
+            if (!file) {
+                throw runtime_error("Unable to open file: " + filename);
+            }
+            string line;
+            while (getline(file, line)) {
+                cout << line << endl;
+            }
+            file.close();
+        } catch (const runtime_error& e) {
+            cout << e.what() << endl;
+            return;
+        }
+    }
 };
     
 
@@ -198,9 +202,10 @@ void lineup_card_app(){
             cout << "Enter lineup card name to view: ";
             getline(cin, lineup_name);
             cout << "Viewing lineup card: " << lineup_name << endl;
+            LineupCard::display_lineup_card(lineup_name);
         }
         if (operation == "create"){
-            cout << "Create a new lineup card from scratch or reuse an old one? (new/reuse):";
+            cout << "Create a new lineup card from scratch or reuse an old one? (new/reuse): ";
             getline(cin, create_operation);
             if (create_operation == "new"){
                 cout << "Creating a new lineup card from scratch." << endl;
@@ -210,6 +215,5 @@ void lineup_card_app(){
         }
     }
 }
-
 
 #endif
