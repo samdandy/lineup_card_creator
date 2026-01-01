@@ -156,4 +156,12 @@ void startup_art(){
     cout << "======================================" << endl;
 }
 
+bool check_position_input(const string& type, const int& input) {
+    if (type == "batting_order_position" || type == "fielding_position") {
+        return input >= 1 && input <= 9;
+    }
+    return false;
+}
+
+
 #endif 

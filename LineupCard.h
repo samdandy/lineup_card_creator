@@ -9,6 +9,7 @@
 #include <fstream>
 #include <iostream>
 #include <mutex>
+#include <iomanip>
 using namespace std;
 
 
@@ -54,12 +55,7 @@ public:
     }
 
     
-    bool check_position_input(const string& type, const int& input) {
-    if (type == "batting_order_position" || type == "fielding_position") {
-        return input >= 1 && input <= 9;
-    }
-    return false;
-}
+  
 bool check_starting_lineup_complete(const LineupCard& lineup_card) {
     auto starters = lineup_card.get_starters();
     if (starters.size() < 9) {
@@ -79,6 +75,7 @@ bool check_starting_lineup_complete(const LineupCard& lineup_card) {
     }
     return true;
 }
+
 vector<shared_ptr<Player>> prompt_for_players() {
     vector<shared_ptr<Player>> players;
     string input;
@@ -126,24 +123,24 @@ vector<shared_ptr<Player>> prompt_for_players() {
         file << "Opponent: " << header.opponent << endl;
         file << "Venue: " << header.venue << endl;
         file << "-------------------------------------------------------------------------------------------" << endl;
-        file << "Batting Order| Player Name           | Number | Position" << endl;
+        file << "Batting Order | Player Name           | Number | Position" << endl;
         file << "-------------------------------------------------------------------------------------------" << endl;
         auto starters = get_starters(true);
         for (const auto &player : starters) {
-            file << "      " << player->batting_order_position << "      | " 
-                 << player->get_full_name() << string(22 - player->get_full_name().length(), ' ') << "| "
-                 << player->number << string(7 - to_string(player->number).length(), ' ') << "| "
-                 << player->position << endl;
+            file << setw(13) << right << player->batting_order_position << " | " 
+                << left << setw(21) << player->get_full_name() << " | "
+                << setw(6) << player->number << " | "
+                << player->position << endl;
         }
         auto subs = get_substitutes();
         if (!subs.empty()) {
             file << "-------------------------------------------------------------------------------------------" << endl;
             file << "Substitutes:" << endl;
             for (const auto &player : subs) {
-                file << "                | " 
-                     << player->get_full_name() << string(22 - player->get_full_name().length(), ' ') << "| "
-                     << player->number << string(7 - to_string(player->number).length(), ' ') << "| "
-                     << "Substitute" << endl;
+                file << setw(13) << right << "" << " | " 
+                    << left << setw(21) << player->get_full_name() << " | "
+                    << setw(6) << player->number << " | "
+                    << "Substitute" << endl;
             }
         }
     }
@@ -209,8 +206,8 @@ void lineup_card_app(){
             getline(cin, create_operation);
             if (create_operation == "new"){
                 cout << "Creating a new lineup card from scratch." << endl;
-                LineupCard lineup_card;
-                lineup_card.create_new_lineup_card();         
+                shared_ptr<LineupCard> lineup_card = make_shared<LineupCard>();
+                lineup_card->create_new_lineup_card();         
             }
         }
     }
