@@ -16,10 +16,12 @@ using namespace std;
 mutex file_mutex;
 
 class LineupCard {
-public:
+
+private:
     lineup_card_headers header;
     vector<shared_ptr<Player>> players;
 
+public:
     LineupCard(
         const lineup_card_headers& headers,
         const vector<shared_ptr<Player>>& players
@@ -34,7 +36,7 @@ public:
     vector<shared_ptr<Player>> get_starters(const bool& sort=false) const {
         vector<shared_ptr<Player>> starters;
         for (const auto &player : players) {
-            if (player->position != 0) {
+            if (player->get_position() != 0) {
                 starters.push_back(player);
             }
         }
@@ -47,7 +49,7 @@ public:
     vector<shared_ptr<Player>> get_substitutes() const {
         vector<shared_ptr<Player>> subs;
         for (const auto &player : players) {
-            if (player->position == 0){
+            if (player->get_position() == 0){
                 subs.push_back(player);
             }
         }
@@ -127,10 +129,10 @@ vector<shared_ptr<Player>> prompt_for_players() {
         file << "-------------------------------------------------------------------------------------------" << endl;
         auto starters = get_starters(true);
         for (const auto &player : starters) {
-            file << setw(13) << right << player->batting_order_position << " | " 
+            file << setw(13) << right << player->get_batting_order_position() << " | " 
                 << left << setw(21) << player->get_full_name() << " | "
-                << setw(6) << player->number << " | "
-                << player->position << endl;
+                << setw(6) << player->get_number() << " | "
+                << player->get_position() << endl;
         }
         auto subs = get_substitutes();
         if (!subs.empty()) {
@@ -139,7 +141,7 @@ vector<shared_ptr<Player>> prompt_for_players() {
             for (const auto &player : subs) {
                 file << setw(13) << right << "" << " | " 
                     << left << setw(21) << player->get_full_name() << " | "
-                    << setw(6) << player->number << " | "
+                    << setw(6) << player->get_number() << " | "
                     << "Substitute" << endl;
             }
         }
@@ -202,13 +204,9 @@ void lineup_card_app(){
             LineupCard::display_lineup_card(lineup_name);
         }
         if (operation == "create"){
-            cout << "Create a new lineup card from scratch or reuse an old one? (new/reuse): ";
-            getline(cin, create_operation);
-            if (create_operation == "new"){
-                cout << "Creating a new lineup card from scratch." << endl;
-                shared_ptr<LineupCard> lineup_card = make_shared<LineupCard>();
-                lineup_card->create_new_lineup_card();         
-            }
+            cout << "Creating a new lineup card from scratch." << endl;
+            shared_ptr<LineupCard> lineup_card = make_shared<LineupCard>();
+            lineup_card->create_new_lineup_card();         
         }
     }
 }

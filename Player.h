@@ -9,12 +9,13 @@ using namespace std;
 
 
 class Player {
-    public:
+    private:
         string first_name;
         string last_name;
         int number;
         int position;
         int batting_order_position;
+    public:
     
         Player(const string &fn, const string &ln, const int num, const int &pos, const int &bat_pos): first_name(fn), last_name(ln), number(num), position(pos), batting_order_position(bat_pos) {}
         Player() : first_name(""), last_name(""), number(0), position(0), batting_order_position(0) {}
@@ -32,6 +33,23 @@ class Player {
 
     string get_player_info() {
         return "Name: " + get_full_name() + ", Number: " + to_string(number) + ", Position: " + to_string(position) + ", Batting Order Position: " + to_string(batting_order_position);
+    }
+
+    string get_first_name(){
+        return first_name;
+    }
+    string get_last_name(){
+        return last_name;
+    }
+    int get_number(){
+        return number;
+    }
+    int get_position(){
+        return position;
+    }
+
+    int get_batting_order_position(){
+        return batting_order_position;
     }
 
     void set_position(const int &pos) {
